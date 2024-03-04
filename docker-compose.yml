@@ -1,0 +1,52 @@
+version: '3'
+services:
+
+    web:
+        build:
+            context: ./
+            dockerfile: web.docker
+        volumes:
+            - ./:/var/www
+        ports:
+            - "8095:95"
+        links:
+            - app
+
+    app:
+        build:
+            context: ./
+            dockerfile: app.docker
+        volumes:
+            - ./:/var/www
+            - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+        links:
+            - database
+            - redis
+        environment:
+            - "DB_PORT=3306"
+            - "DB_RO_HOST=database"
+            - "DB_RW_HOST=database"
+        dns:
+            - 8.8.8.8
+            - 9.9.9.9
+    database:
+        image: mysql:5.7
+        command: --init-file /tmp/phpunit-database.sql
+        volumes:
+            - ./phpunit-database.sql:/tmp/phpunit-database.sql
+            - ./dbdata:/var/lib/mysql
+            - ./mysql-database.cnf:/etc/mysql/conf.d/mysql-database.cnf
+
+        environment:
+            - "MYSQL_ROOT_PASSWORD=root"
+            - "MYSQL_DATABASE=ana_test"
+        ports:
+            - "33063:3306"
+
+    redis:
+        container_name: redis
+        hostname: redis
+        image: redis
+        ports:
+            - "6379:6379"
+
