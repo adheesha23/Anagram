@@ -60,7 +60,7 @@ class AnagramService
 
         $words = array_map(function () use ($faker) {
             return $faker->word;
-        }, array_fill(0, 1000, null));
+        }, array_fill(0, 1000000, null));
 
         return array_merge($words, $wordsArray);
     }
